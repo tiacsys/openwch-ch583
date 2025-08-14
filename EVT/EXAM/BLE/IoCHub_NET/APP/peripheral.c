@@ -640,6 +640,7 @@ static void Peripheral_LinkTerminated(gapRoleEvent_t *pEvent)
             uint8 advertising_enable = TRUE;
             GAPRole_SetParameter(GAPROLE_ADVERT_ENABLED, sizeof(uint8), &advertising_enable);
             GPIOB_SetBits(LED_LINK_PIN);
+            tmos_stop_task(Peripheral_TaskID, IOCHUB_ALL_DP_UPLOAD_EVT);
         }
     }
     else

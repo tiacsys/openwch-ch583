@@ -3,7 +3,7 @@
  * Author             : WCH
  * Version            : V1.0
  * Date               : 2020/08/06
- * Description        : Direct test mode
+ * Description        :
  *********************************************************************************
  * Copyright (c) 2021 Nanjing Qinheng Microelectronics Co., Ltd.
  * Attention: This software (modified or not) and binary are used for 
@@ -12,12 +12,10 @@
 
 /******************************************************************************/
 /* 头文件包含 */
+#include <RF_dtm.h>
 #include "CONFIG.h"
 #include "HAL.h"
-#include "test_dtm.h"
-#include "uart.h"
 #include "app_usb.h"
-
 
 /*********************************************************************
  * GLOBAL TYPEDEFS
@@ -42,6 +40,7 @@ void Main_Circulation()
     while(1)
     {
         TMOS_SystemProcess();
+        DtmProcess();
     }
 }
 
@@ -54,34 +53,27 @@ void Main_Circulation()
  */
 int main(void)
 {
-#if(defined(DCDC_ENABLE)) && (DCDC_ENABLE == TRUE)
-    PWR_DCDCCfg(ENABLE);
-#endif
     SetSysClock(CLK_SOURCE_PLL_60MHz);
-#if(defined(HAL_SLEEP)) && (HAL_SLEEP == TRUE)
-    GPIOA_ModeCfg(GPIO_Pin_All, GPIO_ModeIN_PU);
-    GPIOB_ModeCfg(GPIO_Pin_All, GPIO_ModeIN_PU);
-#endif
 #ifdef DEBUG
-#if  DEBUG == 0     // 0为默认UART0打印，UART1为测试(在工程配置中修改DEBUG)
     GPIOB_SetBits(bTXD0);
     GPIOB_ModeCfg(bTXD0, GPIO_ModeOut_PP_5mA);
     UART0_DefInit();
-#elif DEBUG == 1
     GPIOA_SetBits(bTXD1);
     GPIOA_ModeCfg(bTXD1, GPIO_ModeOut_PP_5mA);
+    GPIOA_ModeCfg(bRXD1, GPIO_ModeIN_PU);
     UART1_DefInit();
 #endif
-#endif
+    PRINT("start.\n");
     PRINT("%s\n", VER_LIB);
     CH58X_BLEInit();
     HAL_Init();
-    test_dtm_init();
-    GAPRole_CentralInit();
-    uart_task_init();
-#if USB_UartEnable == 1
+    RF_RoleInit();
+    UART1_ByteTrigCfg( UART_4BYTE_TRIG );
+    UART1_INTCfg( ENABLE,  RB_IER_RECV_RDY );
+    PFIC_EnableIRQ( UART1_IRQn );
     app_usb_init();
-#endif
+    RF_Init();
     Main_Circulation();
 }
+
 /******************************** endfile @ main ******************************/

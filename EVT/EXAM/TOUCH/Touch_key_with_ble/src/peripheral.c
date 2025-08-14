@@ -139,7 +139,7 @@ static uint8_t attDeviceName[ GAP_DEVICE_NAME_LEN ] = "Ble_Touch";
 // Connection item list
 peripheralConnItem_t peripheralConnList;
 
-static uint16_t peripheralMTU = ATT_MTU_SIZE;
+static uint8_t peripheralMTU = ATT_MTU_SIZE;
 
 uint16_t peripheral_Mtu = 23;
 /*********************************************************************
@@ -193,9 +193,9 @@ void blk_period(uint32_t timeUs)
 {
     if (!wakeupflag)
     {
-        PRINT("1\n");
+        dg_log("1\n");
         PeriodicDealData();
-        PRINT("2\n");
+        dg_log("2\n");
     }
 }
 /*********************************************************************
